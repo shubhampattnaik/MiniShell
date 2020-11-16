@@ -1,32 +1,32 @@
 #include "main.h"
 
 /*=================================================================================
-   Signal handling for ctrl+z and ctrl+c
+  Signal handling for ctrl+z and ctrl+c
  * Input:		Signals: SIGINT, SIGTSTP
  * Output:		sig_flag
  * Description:		Handle signals for SIGINT and SIGTSTP, if signals are raised
-   because of CTRL+C and CTRL+Z respectiviely.
+ because of CTRL+C and CTRL+Z respectiviely.
  ==================================================================================*/
 void signal_handler(int arg)
 {
     if(arg == SIGINT)
     {
-	//TERMINATE CURRENT CHILD PROCRSS
-	sig_flag = 'c';
+        //TERMINATE CURRENT CHILD PROCRSS
+        sig_flag = 'c';
     }
     else if(arg == SIGTSTP)
     {
-	//STOP CHILD PROCESS AND INSERT PID OF CHILD AT LAST
-	sig_flag = 's';
+        //STOP CHILD PROCESS AND INSERT PID OF CHILD AT LAST
+        sig_flag = 's';
     }
 }
 
 /*=================================================================================
-   Read command till next-line char and store in into a buffer 
+  Read command till next-line char and store in into a buffer 
  * Input:		Structure pointer
  * Output:		e_success
  * Description:		Get one-one character from stdin, store it into an array,
-   as well as into a 2D array with their options. 
+ as well as into a 2D array with their options. 
  ==================================================================================*/
 status read_cmd(cmd_str *cmd_t)
 {
@@ -35,37 +35,37 @@ status read_cmd(cmd_str *cmd_t)
 
     while((ch = getchar()) != '\n')
     {
-	if(ch == ' ')
-	{
-	    cmd_t->cmd_buf[i][j][++k] = '\0';
-	    k = -1;
-	    j++;
-	    cmd_t->cmd[++a] = ch;
-	    ch = getchar();
-	}
-	if(ch == '|')
-	{
-	    //cmd_t->cmd_buf[i][j][++k] = '\0';
-	    k = -1;
-	    j = 0;
-	    i++;
-	    cmd_t->cmd[++a] = ch;
-	    ch = getchar();
-	    cmd_t->cmd[++a] = ch;
-	    ch = getchar();
-	}
-	cmd_t->cmd_buf[i][j][++k] = ch;
-	cmd_t->cmd[++a] = ch;
+        if(ch == ' ')
+        {
+            cmd_t->cmd_buf[i][j][++k] = '\0';
+            k = -1;
+            j++;
+            cmd_t->cmd[++a] = ch;
+            ch = getchar();
+        }
+        if(ch == '|')
+        {
+            //cmd_t->cmd_buf[i][j][++k] = '\0';
+            k = -1;
+            j = 0;
+            i++;
+            cmd_t->cmd[++a] = ch;
+            ch = getchar();
+            cmd_t->cmd[++a] = ch;
+            ch = getchar();
+        }
+        cmd_t->cmd_buf[i][j][++k] = ch;
+        cmd_t->cmd[++a] = ch;
     }
     if(cmd_t->cmd_buf[i][j][k] == ' ')
     {
-	cmd_t->cmd_buf[i][j][k] = '\0';
-	cmd_t->cmd[a] = '\0';
+        cmd_t->cmd_buf[i][j][k] = '\0';
+        cmd_t->cmd[a] = '\0';
     }
     else
     {
-	cmd_t->cmd_buf[i][j][++k] = '\0';
-	cmd_t->cmd[++a] = '\0';
+        cmd_t->cmd_buf[i][j][++k] = '\0';
+        cmd_t->cmd[++a] = '\0';
     }
 
     return e_success;
@@ -76,7 +76,7 @@ status read_cmd(cmd_str *cmd_t)
  * Input:		Structure
  * Output:		e_success / e_failure
  * Description:		This function will check for <PS1=> command, and store
-   new prompt to usr_prompt string.
+ new prompt to usr_prompt string.
  ================================================================================*/
 status check_prompt_cmd(cmd_str *cmd_t, int *prompt_flag)
 {
@@ -84,64 +84,64 @@ status check_prompt_cmd(cmd_str *cmd_t, int *prompt_flag)
     char ps_arr[6];
     char var_ps[6];
     char var_arr[20];
-    
+
     len = strlen(cmd_t->cmd);
 
     if(len > 6)
     {
-	for(i = 0; i < 5; i++)
-	{
-	    ps_arr[i] = cmd_t->cmd[i];
-	}
-	ps_arr[i] = '\0';
+        for(i = 0; i < 5; i++)
+        {
+            ps_arr[i] = cmd_t->cmd[i];
+        }
+        ps_arr[i] = '\0';
 
-	if(strcmp("PS1=$", ps_arr) == 0)
-	{
-	    for(i = 0, j = 5; cmd_t->cmd[j] != '\0'; i++, j++)
-	    {
-		var_arr[i] = cmd_t->cmd[j];
-	    }
-	    var_arr[i] = '\0';
-	    if(strcmp(cmd_t->prompt_var, var_arr) == 0)
-	    {
-		*prompt_flag = 2;
-		return e_success;
-	    }
-	}
-	else
-	{
-	    ps_arr[4] = '\0';
+        if(strcmp("PS1=$", ps_arr) == 0)
+        {
+            for(i = 0, j = 5; cmd_t->cmd[j] != '\0'; i++, j++)
+            {
+                var_arr[i] = cmd_t->cmd[j];
+            }
+            var_arr[i] = '\0';
+            if(strcmp(cmd_t->prompt_var, var_arr) == 0)
+            {
+                *prompt_flag = 2;
+                return e_success;
+            }
+        }
+        else
+        {
+            ps_arr[4] = '\0';
 
-	    if(strcmp("PS1=", ps_arr) == 0)
-	    {
-		for(i = 0; cmd_t->cmd[i] != '\0'; i++)
-		{
-		    cmd_t->usr_prompt[i] = cmd_t->cmd[i+4];
-		}
-		cmd_t->usr_prompt[i] = '\0';
-		*prompt_flag = 1;
+            if(strcmp("PS1=", ps_arr) == 0)
+            {
+                for(i = 0; cmd_t->cmd[i] != '\0'; i++)
+                {
+                    cmd_t->usr_prompt[i] = cmd_t->cmd[i+4];
+                }
+                cmd_t->usr_prompt[i] = '\0';
+                *prompt_flag = 1;
 
-		return e_success;
-	    }
-	    else
-	    {
-		for(i = (len - 1), j = 4; i >= (len-5); i--, j--)
-		{
-		    var_ps[j] = cmd_t->cmd[i];
-		}
-		var_ps[5] = '\0';
-		if(strcmp("=$PS1", var_ps) == 0)
-		{
-		    for(i = 0; cmd_t->cmd[i] != '='; i++)
-		    {
-			cmd_t->prompt_var[i] = cmd_t->cmd[i];
-		    }
-		    cmd_t->prompt_var[i] = '\0';
+                return e_success;
+            }
+            else
+            {
+                for(i = (len - 1), j = 4; i >= (len-5); i--, j--)
+                {
+                    var_ps[j] = cmd_t->cmd[i];
+                }
+                var_ps[5] = '\0';
+                if(strcmp("=$PS1", var_ps) == 0)
+                {
+                    for(i = 0; cmd_t->cmd[i] != '='; i++)
+                    {
+                        cmd_t->prompt_var[i] = cmd_t->cmd[i];
+                    }
+                    cmd_t->prompt_var[i] = '\0';
 
-		    return e_success;
-		}
-	    }
-	}
+                    return e_success;
+                }
+            }
+        }
     }
     return e_failure;
 }
@@ -151,39 +151,39 @@ status check_prompt_cmd(cmd_str *cmd_t, int *prompt_flag)
  * Input:		Structure
  * Output:		e_success / e_failure / e_quit
  * Description:		This function will check for available system calls, for 
-   cd and pwd, using string compare, and call the respective system call for that 
-   command. Also if user is passing quit, it will terminate the minishell.
+ cd and pwd, using string compare, and call the respective system call for that 
+ command. Also if user is passing quit, it will terminate the minishell.
  ================================================================================*/
 status check_sys_call(cmd_str *cmd_t)
 {
     if(strcmp("cd", cmd_t->cmd_buf[0][0]) == 0)
     {
-	if(*(cmd_t->cmd_buf[0][1]) == '\0')
-	{
-	    chdir(getenv("HOME"));
-	}
-	else
-	{
-	    if(chdir(cmd_t->cmd_buf[0][1]) == -1)
-	    {
-		perror("chdir");
-		return e_failure;
-	    }
-	}
-	return e_success;
+        if(*(cmd_t->cmd_buf[0][1]) == '\0')
+        {
+            chdir(getenv("HOME"));
+        }
+        else
+        {
+            if(chdir(cmd_t->cmd_buf[0][1]) == -1)
+            {
+                perror("chdir");
+                return e_failure;
+            }
+        }
+        return e_success;
     }
     if(strcmp("pwd", cmd_t->cmd_buf[0][0]) == 0)
     {
-	//memset(&cmd_t->addr_buf, '\0', sizeof(cmd_t->addr_buf));
-	getcwd(cmd_t->addr_buf, sizeof(cmd_t->addr_buf));
-	printf("%s\n", cmd_t->addr_buf);
-	return e_success;
+        //memset(&cmd_t->addr_buf, '\0', sizeof(cmd_t->addr_buf));
+        getcwd(cmd_t->addr_buf, sizeof(cmd_t->addr_buf));
+        printf("%s\n", cmd_t->addr_buf);
+        return e_success;
     }
 
     if(strcmp("quit", cmd_t->cmd_buf[0][0]) == 0)
     {
-	//Terminate from minishell
-	return e_quit;
+        //Terminate from minishell
+        return e_quit;
     }
 }
 
@@ -203,32 +203,32 @@ status check_echo_cmd(cmd_str *cmd_t, int *flag)
 
     if(strcmp("echo", cmd_t->cmd_buf[0][0]) == 0)
     {
-	if(*(cmd_t->cmd_buf[0][1]) == '$')
-	{
-	    strcpy(buf, cmd_t->cmd_buf[0][1]);
+        if(*(cmd_t->cmd_buf[0][1]) == '$')
+        {
+            strcpy(buf, cmd_t->cmd_buf[0][1]);
 
-	    if((strcmp("$$", buf)) == 0)
-	    {
-		printf("%d\n", getpid());
-	    }
-	    else if((strcmp("$?", buf)) == 0)
-	    {
-		printf("%d\n", ret_val);
-	    }
-	    else if((strcmp("$SHELL", buf)) == 0)
-	    {
-		*flag = 1;
-	    }
-	    else
-	    {
-		puts("Default case");
-		return e_failure;
-	    }
+            if((strcmp("$$", buf)) == 0)
+            {
+                printf("%d\n", getpid());
+            }
+            else if((strcmp("$?", buf)) == 0)
+            {
+                printf("%d\n", ret_val);
+            }
+            else if((strcmp("$SHELL", buf)) == 0)
+            {
+                *flag = 1;
+            }
+            else
+            {
+                puts("Default case");
+                return e_failure;
+            }
 
-	    ret_val = 0;
-	    return e_success;
-	}
-	return e_failure;
+            ret_val = 0;
+            return e_success;
+        }
+        return e_failure;
     }
 }
 
@@ -245,33 +245,33 @@ status exec_stopped_process_in_fg(cmd_str *cmd_t, DList **head, DList **tail)
 {
     if((*head) != NULL)
     {
-	int status;
-	pid_t b_pid;
+        int status;
+        pid_t b_pid;
 
-	DList *temp = *head;
+        DList *temp = *head;
 
-	while(temp->next)
-	    temp = temp->next;
-	b_pid = temp->pid;
+        while(temp->next)
+            temp = temp->next;
+        b_pid = temp->pid;
 
-	printf("%d\n", b_pid);
+        printf("%d\n", b_pid);
 
-	if(kill((b_pid), SIGCONT) < 0)
-	{
-	    perror("kill (SIGCONT)");
-	}
-	else
-	{
-	    delete_last(head, tail);
-	    idx--;
-	}
+        if(kill((b_pid), SIGCONT) < 0)
+        {
+            perror("kill (SIGCONT)");
+        }
+        else
+        {
+            delete_last(head, tail);
+            idx--;
+        }
 
-	waitpid(b_pid, &status, WUNTRACED);
+        waitpid(b_pid, &status, WUNTRACED);
     }
     else
     {
-	printf("minishell: fg: current: no such job\n");
-	return e_success;
+        printf("minishell: fg: current: no such job\n");
+        return e_success;
     }
     return e_success;
 }
@@ -289,28 +289,28 @@ status exec_stopped_process_in_bg(cmd_str *cmd_t, DList **head, DList **tail)
 {
     if((*head) != NULL)
     {
-	pid_t b_pid;
-	int status;
+        pid_t b_pid;
+        int status;
 
-	DList *temp = *head;
+        DList *temp = *head;
 
-	signal(SIGCHLD, SIG_IGN);
+        signal(SIGCHLD, SIG_IGN);
 
-	while(temp->next)
-	    temp = temp->next;
-	b_pid = temp->pid;
+        while(temp->next)
+            temp = temp->next;
+        b_pid = temp->pid;
 
-	printf("%d &\n", b_pid);
-	kill((b_pid), SIGCONT);
+        printf("%d &\n", b_pid);
+        kill((b_pid), SIGCONT);
 
-	delete_last(head, tail);
-	idx--;
+        delete_last(head, tail);
+        idx--;
 
-	//waitpid(b_pid, &status, WNOHANG);
+        //waitpid(b_pid, &status, WNOHANG);
     }
     else
     {
-	printf("minishell: fg: current: no such job\n");
+        printf("minishell: fg: current: no such job\n");
     }
     return e_success;
 }
@@ -337,78 +337,78 @@ status command_processor(cmd_str *cmd_t, int *flag, DList **head, DList **tail)
     command_parser(cmd_t->cmd, &cmd_p);
     if((check_echo_cmd(cmd_t, flag)) == e_success)
     {
-	return e_success;
+        return e_success;
     }
 
     if(strcmp("fg", cmd_p.buf[0][0]) == 0)
     {
-	//print_list(*head);
-	if((exec_stopped_process_in_fg(cmd_t, head, tail)) == e_success)
-	{
-	    return e_success;
-	}
+        //print_list(*head);
+        if((exec_stopped_process_in_fg(cmd_t, head, tail)) == e_success)
+        {
+            return e_success;
+        }
     }
     else if(strcmp("bg", cmd_p.buf[0][0]) == 0)
     {
-	if((exec_stopped_process_in_bg(cmd_t, head, tail)) == e_success)
-	{
-	    return e_success;
-	}
+        if((exec_stopped_process_in_bg(cmd_t, head, tail)) == e_success)
+        {
+            return e_success;
+        }
     }
     else if(strcmp("jobs", cmd_p.buf[0][0]) == 0)
     {
-	print_list(*head);
-	ret_val = 0;
-	return e_success;
+        print_list(*head);
+        ret_val = 0;
+        return e_success;
     }
 
     if(!cmd_p.pipe_count)
     {
-	pid_t pgid;
-	pid_t pid = fork();
-	if(!pid)
-	{
-	    ret_val = execvp(cmd_p.buf[0][0], cmd_p.buf[0]);
-	    if(ret_val == -1)
-	    {
-		printf("minishell: %s: command not found\n", cmd_p.buf[0][0]);
-		exit(1);
-	    }
-	}
-	else
-	{
-	    wait(&status);
+        pid_t pgid;
+        pid_t pid = fork();
+        if(!pid)
+        {
+            ret_val = execvp(cmd_p.buf[0][0], cmd_p.buf[0]);
+            if(ret_val == -1)
+            {
+                printf("minishell: %s: command not found\n", cmd_p.buf[0][0]);
+                exit(1);
+            }
+        }
+        else
+        {
+            wait(&status);
 
-	    ret_val = status;
+            ret_val = status;
 
-	    setpgid(pid, msh_pgid);
+            setpgid(pid, msh_pgid);
 
-	    if(sig_flag == 'c')
-	    {
-		printf("\n");
-		if((kill(pid, SIGKILL)) < 0)
-		{
-		    printf("pid: %d\n", pid);
-		    perror("kill (SIGKILL)");
-		}
+            if(sig_flag == 'c')
+            {
+                printf("\n");
+                if((kill(pid, SIGKILL)) < 0)
+                {
+                    printf("pid: %d\n", pid);
+                    perror("kill (SIGKILL)");
+                }
 
-		sig_flag = 0;
-		return e_failure;
-	    }
-	    else if(sig_flag == 's')
-	    {
-		sig_flag = 0;
-		pgid = pid;
+                sig_flag = 0;
+                return e_failure;
+            }
+            else if(sig_flag == 's')
+            {
+                sig_flag = 0;
+                pgid = pid;
 
-		insert_at_last(head, pid, pgid, tail);
-		printf("\n[%d]+  Stopped			%s %s  pid: %d\n", ++idx, cmd_p.buf[0][0], cmd_p.buf[0][1], pgid);
-		return e_success;
-	    }
-	}
+                insert_at_last(head, pid, pgid, tail);
+                printf("\n[%d]+  Stopped			%s %s  pid: %d\n", ++idx, cmd_p.buf[0][0], cmd_p.buf[0][1], pgid);
+                return e_success;
+            }
+        }
     }
     else
     {
-	process_piped_cmd(cmd_p.buf);
+        process_piped_cmd(cmd_p.buf);
     }
     return e_success;
 
@@ -429,33 +429,33 @@ void command_parser(char *str, parse_cmd *cmd_p)
 
     while(str[k] != '\0')
     {
-	if(str[k] == '|')
-	{
-	    cmd_p->pipe_count++;
-	    cmd_p->buf[n][a] = NULL;
-	    a = 0; n++; k++; j = -1;
-	    if(str[k] == ' ')
-	    {
-		k++;
-	    }
-	}
-	while(str[k] != ' ')
-	{
-	    if(str[k] == '\0')
-	    {
-		k--;
-		goto label;
-	    }
-	    if(str[k] == '"')
-	    {
-		k++;
-	    }
-	    else
-	    {
-		cmd_p->opt[i][++j] = str[k];
-		k++;
-	    }
-	}
+        if(str[k] == '|')
+        {
+            cmd_p->pipe_count++;
+            cmd_p->buf[n][a] = NULL;
+            a = 0; n++; k++; j = -1;
+            if(str[k] == ' ')
+            {
+                k++;
+            }
+        }
+        while(str[k] != ' ')
+        {
+            if(str[k] == '\0')
+            {
+                k--;
+                goto label;
+            }
+            if(str[k] == '"')
+            {
+                k++;
+            }
+            else
+            {
+                cmd_p->opt[i][++j] = str[k];
+                k++;
+            }
+        }
 label:cmd_p->opt[i][++j] = '\0';
       cmd_p->buf[n][a] = cmd_p->opt[i];
       k++; i++; a++; j = -1;
@@ -484,35 +484,51 @@ void process_piped_cmd(char *cmd[100][100])
 
     while(cmd[i][0] != NULL)
     {
-	pipe(fd);
-	if((pid = fork()) == -1)
-	{
-	    exit(1);
-	}
-	else if(pid == 0)
-	{
-	    dup2(fd_in, 0);
-	    if(cmd[i + 1][0] != NULL)
-	    {
-		dup2(fd[1], 1);
-	    }
-	    close(fd[0]);
-	    ret_val = execvp(cmd[i][0], cmd[i]);
-	    if(ret_val == -1)
-	    {
-		printf("minishell: %s: command not found\n", cmd[i][0]);
-		exit(1);
-	    }
-	}
-	else
-	{
-	    wait(&status);
-	    ret_val = status;
-	    close(fd[1]);
-	    fd_in = fd[0];
-	    i++;
-	}
+        pipe(fd);
+        if((pid = fork()) == -1)
+        {
+            exit(1);
+        }
+        else if(pid == 0)
+        {
+            dup2(fd_in, 0);
+            if(cmd[i + 1][0] != NULL)
+            {
+                dup2(fd[1], 1);
+            }
+            close(fd[0]);
+            ret_val = execvp(cmd[i][0], cmd[i]);
+            if(ret_val == -1)
+            {
+                printf("minishell: %s: command not found\n", cmd[i][0]);
+                exit(1);
+            }
+        }
+        else
+        {
+            wait(&status);
+            ret_val = status;
+            close(fd[1]);
+            fd_in = fd[0];
+            i++;
+        }
     }
+}
+
+/* Execute predefined commands for minishell */
+status check_predefined_minishell_cmd(cmd_str *cmd_t)
+{
+    if(strcmp("--help", cmd_t->cmd_buf[0][0]) == 0)
+    {
+        welcome_screen();
+        return e_success;
+    }
+    else if(strcmp("--h", cmd_t->cmd_buf[0][0]) == 0)
+    {
+        welcome_screen();
+        return e_success;
+    }
+    return e_failure;
 }
 
 /* Welcome screen on startup */

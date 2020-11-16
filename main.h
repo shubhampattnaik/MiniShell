@@ -69,5 +69,6 @@ int delete_last(DList **, DList **);
 int print_list(DList *head);
 status exec_stopped_process_in_fg(cmd_str *cmd_t, DList **head, DList **tail);
 status exec_stopped_process_in_bg(cmd_str *cmd_t, DList **head, DList **tail);
+status check_predefined_minishell_cmd(cmd_str *cmd_t);
 
 #endif
