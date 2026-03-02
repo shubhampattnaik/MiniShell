@@ -185,6 +185,8 @@ status check_sys_call(cmd_str *cmd_t)
         //Terminate from minishell
         return e_quit;
     }
+
+    return e_failure;
 }
 
 /*===================================================================================
@@ -230,6 +232,8 @@ status check_echo_cmd(cmd_str *cmd_t, int *flag)
         }
         return e_failure;
     }
+
+    return e_failure;
 }
 
 /*====================================================================================

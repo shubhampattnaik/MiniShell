@@ -3,4 +3,4 @@ OBJ:=$(patsubst %.c, %.o, $(SRC))
 minishell.exe: $(OBJ)
 	gcc -o $@ $(OBJ)
 clean: 
-	rm *.o *.exe
+	rm -f *.o *.exe
